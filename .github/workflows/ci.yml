@@ -1,0 +1,30 @@
+name: ci
+
+on: [pull_request]
+
+jobs:
+    ci:
+        runs-on: ubuntu-20.04
+        steps:
+            - name: checkout
+              uses: actions/checkout@v2
+        
+            - name: tests 
+              env:
+                CLANG_FORMAT_SUBMODULE: /home/runner/work/HSE-Course/HSE-Course/clangformat-cmake
+                TITLE: ${{github.event.pull_request.title}}
+              working-directory: ./module-1/homework/
+              run:  
+                    sudo apt-get install clang-tidy-10 &&
+                    sudo apt-get install clang-format-10 &&
+                    sudo rm -rf /usr/bin/clang-tidy &&
+                    sudo rm -rf /usr/bin/clang-format &&
+                    sudo ln -s /usr/bin/clang-tidy-10 /usr/bin/clang-tidy &&
+                    sudo ln -s /usr/bin/clang-format-10 /usr/bin/clang-format &&
+                    clang-tidy --version &&
+                    clang-format --version &&
+                    git submodule update --init --recursive &&
+                    prname=${TITLE} &&
+                    cmake -B ${prname}/build -S ${prname} &&
+                    cmake --build ${prname}/build --target runner clangformat &&
+                    ./${prname}/build/runner
