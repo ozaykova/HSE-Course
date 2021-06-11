@@ -137,7 +137,8 @@ void SharedPtr<T>::Reset() noexcept {
 
 template <typename T>
 template <typename Y, typename Deleter>
-SharedPtr<T>::SharedPtr(Y* p, Deleter deleter) noexcept: control_(new ControlBlock<T, Deleter>(p, deleter)) {
+SharedPtr<T>::SharedPtr(Y* p, Deleter deleter) noexcept
+    : control_(new ControlBlock<T, Deleter>(p, deleter)) {
     control_->AddStrongPtr();
 }
 
