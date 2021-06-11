@@ -32,7 +32,7 @@ public:
     template <typename Y>
     SharedPtr& operator=(SharedPtr<Y>&& r) noexcept;
 
-    SharedPtr(const WeakPtr<T>& other) noexcept;
+    explicit SharedPtr(const WeakPtr<T>& other) noexcept;
 
     // Modifiers
     void Reset() noexcept;
@@ -62,12 +62,12 @@ private:
     ControlBlock<T>* control_ = nullptr;
 };
 
-template<typename T, typename... Args>
+template <typename T, typename... Args>
 SharedPtr<T> MakeShared(Args&&... args) {
     return SharedPtr<T>(new T(std::forward<Args>(args)...));
 }
 
-template<typename T>
+template <typename T>
 SharedPtr<T>::~SharedPtr() {
     if (control_) {
         control_->DelShared();
@@ -116,12 +116,12 @@ public:
 };
 
 template <typename T>
-T &SharedPtr<T>::operator*() const noexcept {
+T& SharedPtr<T>::operator*() const noexcept {
     return *(control_->GetPtr());
 }
 
 template <typename T>
-T *SharedPtr<T>::operator->() const noexcept {
+T* SharedPtr<T>::operator->() const noexcept {
     return control_->GetPtr();
 }
 
@@ -137,8 +137,7 @@ void SharedPtr<T>::Reset() noexcept {
 
 template <typename T>
 template <typename Y, typename Deleter>
-SharedPtr<T>::SharedPtr(Y* p, Deleter deleter) noexcept :
-    control_(new ControlBlock<T, Deleter>(p, deleter)) {
+SharedPtr<T>::SharedPtr(Y* p, Deleter deleter) noexcept: control_(new ControlBlock<T, Deleter>(p, deleter)) {
     control_->AddStrongPtr();
 }
 
@@ -196,7 +195,7 @@ void SharedPtr<T>::Swap(SharedPtr& other) noexcept {
 }
 
 template <typename T>
-T *SharedPtr<T>::Get() const noexcept {
+T* SharedPtr<T>::Get() const noexcept {
     return control_->GetPtr();
 }
 

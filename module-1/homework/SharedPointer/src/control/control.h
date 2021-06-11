@@ -83,9 +83,6 @@ private:
     T* ptr_ = nullptr;
     Deleter del_;
     bool NeedDel() {
-        if (GetStrongCount() + GetWeakCount() == 0 && ptr_ != nullptr) {
-            return true;
-        }
-        return false;
+        return GetStrongCount() + GetWeakCount() == 0 && ptr_ != nullptr;
     }
 };
