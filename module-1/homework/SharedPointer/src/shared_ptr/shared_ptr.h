@@ -330,9 +330,3 @@ SharedPtr<T> WeakPtr<T>::Lock() const noexcept {
         return SharedPtr<T>(*this);
     }
 }
-
-
-
-// WeakPtr
-// Your code goes here...
-// WeakPtr
