@@ -43,7 +43,7 @@ add_executable(runner tests.cpp)
 ################ clang-format ################
 list(APPEND CMAKE_MODULE_PATH $ENV{CLANG_FORMAT_SUBMODULE}/cmake)
 include(ClangFormat)
-target_clangformat_setup()
+target_clangformat_setup(runner)
 
 add_subdirectory(src/control)
 add_subdirectory(src/shared_ptr)
