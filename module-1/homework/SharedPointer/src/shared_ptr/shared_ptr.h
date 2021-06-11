@@ -14,7 +14,9 @@ public:
     constexpr SharedPtr() noexcept = default;
     ~SharedPtr();
     template <typename Y>
-    explicit SharedPtr(Y* p) : Control(new ControlBlock<T>(p)) {Control->AddStrongPtr();};
+    explicit SharedPtr(Y* p) : control_(new ControlBlock<T>(p)) {
+        control_->AddStrongPtr();
+    };
 
     template <typename Y, typename Deleter>
     SharedPtr(Y* p, Deleter deleter) noexcept;
@@ -52,14 +54,14 @@ public:
     T* operator->() const noexcept;
     element_type& operator[](std::ptrdiff_t idx) const;
     explicit operator bool() const noexcept {
-        return Control && !Control->IsEmpty();
+        return control_ && !control_->IsEmpty();
     };
 
     template <typename U>
     friend class WeakPtr;
 
 private:
-    ControlBlock<T>* Control = nullptr;
+    ControlBlock<T>* control_ = nullptr;
 };
 
 template<typename T, typename... Args>
@@ -69,8 +71,8 @@ SharedPtr<T> MakeShared(Args&&... args) {
 
 template<typename T>
 SharedPtr<T>::~SharedPtr() {
-    if (Control) {
-        Control->DelShared();
+    if (control_) {
+        control_->DelShared();
     }
 }
 
@@ -114,39 +116,39 @@ public:
     friend class SharedPtr;
 
 public:
-    ControlBlock<T>* Control;
+    ControlBlock<T>* control_;
 };
 
 template<typename T>
 T &SharedPtr<T>::operator*() const noexcept {
-    return *(Control->GetPtr());
+    return *(control_->GetPtr());
 }
 
 template<typename T>
 T *SharedPtr<T>::operator->() const noexcept {
-    return Control->GetPtr();
+    return control_->GetPtr();
 }
 
 template<typename T>
 int64_t SharedPtr<T>::UseCount() const noexcept {
-    return Control->GetStrongCount();
+    return control_->GetStrongCount();
 }
 
 template<typename T>
 void SharedPtr<T>::Reset() noexcept {
-    Control = nullptr;
+    control_ = nullptr;
 }
 
 template<typename T>
 template<typename Y, typename Deleter>
-SharedPtr<T>::SharedPtr(Y *p, Deleter deleter) noexcept : Control(new ControlBlock<T, Deleter>(p, deleter)) {
-    Control->AddStrongPtr();
+SharedPtr<T>::SharedPtr(Y *p, Deleter deleter) noexcept : control_(new ControlBlock<T, Deleter>(p, deleter)) {
+    control_->AddStrongPtr();
 }
 
 template<typename T>
 SharedPtr<T>::SharedPtr(const SharedPtr &other) noexcept {
-    Control = other.Control;
-    Control->AddStrongPtr();
+    control_ = other.control_;
+    control_->AddStrongPtr();
 }
 
 template<typename T>
@@ -155,12 +157,12 @@ SharedPtr<T> &SharedPtr<T>::operator=(const SharedPtr &r) noexcept {
         return *this;
     }
 
-    if (Control) {
-        Control->DelShared();
+    if (control_) {
+        control_->DelShared();
     }
 
-    Control = r.Control;
-    Control->AddStrongPtr();
+    control_ = r.control_;
+    control_->AddStrongPtr();
     return *this;
 }
 
@@ -170,35 +172,35 @@ SharedPtr<T> &SharedPtr<T>::operator=(SharedPtr<T> &&r) noexcept {
         return *this;
     }
 
-    if (Control) {
-        Control->DelShared();
+    if (control_) {
+        control_->DelShared();
     }
 
-    Control = new ControlBlock<T>();
-    Control->SetPtr(r.Control->GetPtr());
-    Control->SetValues(r.Control->GetStrongCount(), r.Control->GetWeakCount());
-    r.Control->SetValues(0, 0);
-    r.Control->SetPtr(nullptr);
+    control_ = new ControlBlock<T>();
+    control_->SetPtr(r.control_->GetPtr());
+    control_->SetValues(r.control_->GetStrongCount(), r.control_->GetWeakCount());
+    r.control_->SetValues(0, 0);
+    r.control_->SetPtr(nullptr);
     return *this;
 }
 
 template<typename T>
 SharedPtr<T>::SharedPtr(SharedPtr &&other) noexcept {
-    Control = new ControlBlock<T>();
-    Control->SetValues(other.Control->GetStrongCount(), other.Control->GetWeakCount());
-    Control->SetPtr(other.Control->GetPtr());
-    other.Control->SetPtr(nullptr);
-    other.Control->SetValues(0, 0);
+    control_ = new ControlBlock<T>();
+    control_->SetValues(other.control_->GetStrongCount(), other.control_->GetWeakCount());
+    control_->SetPtr(other.control_->GetPtr());
+    other.control_->SetPtr(nullptr);
+    other.control_->SetValues(0, 0);
 }
 
 template<typename T>
 void SharedPtr<T>::Swap(SharedPtr &other) noexcept {
-    swap(Control, other.Control);
+    swap(control_, other.control_);
 }
 
 template<typename T>
 T *SharedPtr<T>::Get() const noexcept {
-    return Control->GetPtr();
+    return control_->GetPtr();
 }
 
 template<typename T>
@@ -215,47 +217,47 @@ void SharedPtr<T>::Reset(Y *p, Deleter deleter) noexcept {
 
 template<typename T>
 SharedPtr<T>::SharedPtr(const WeakPtr<T> &other) noexcept {
-    Control = other.Control;
+    control_ = other.control_;
 
-    Control->SetValues(other.Control->GetStrongCount(), other.Control->GetWeakCount());
-    Control->AddStrongPtr();
+    control_->SetValues(other.control_->GetStrongCount(), other.control_->GetWeakCount());
+    control_->AddStrongPtr();
 }
 
 template<typename T>
 template<typename Y>
 WeakPtr<T>::WeakPtr(const SharedPtr<Y> &other) {
-    Control = new ControlBlock<T>();
-    Control->SetPtr(other.Control->GetPtr());
-    Control->SetValues(other.Control->GetStrongCount(), other.Control->GetWeakCount());
+    control_ = new ControlBlock<T>();
+    control_->SetPtr(other.control_->GetPtr());
+    control_->SetValues(other.control_->GetStrongCount(), other.control_->GetWeakCount());
 
-    Control->AddWeakPtr();
+    control_->AddWeakPtr();
 }
 
 template<typename T>
 WeakPtr<T>::WeakPtr(const WeakPtr &other) noexcept {
-    Control = new ControlBlock<T>();
-    Control->SetPtr(other.Control->GetPtr());
-    Control->SetValues(other.Control->GetStrongCount(), other.Control->GetWeakCount());
+    control_ = new ControlBlock<T>();
+    control_->SetPtr(other.control_->GetPtr());
+    control_->SetValues(other.control_->GetStrongCount(), other.control_->GetWeakCount());
 
-    Control->AddWeakPtr();
+    control_->AddWeakPtr();
 }
 
 template<typename T>
 WeakPtr<T>::WeakPtr(WeakPtr &&other) noexcept {
-    Control = new ControlBlock<T>();
-    Control->SetPtr(other.Control->GetPtr());
-    Control->SetValues(other.Control->GetStrongCount(), other.Control->GetWeakCount());
+    control_ = new ControlBlock<T>();
+    control_->SetPtr(other.control_->GetPtr());
+    control_->SetValues(other.control_->GetStrongCount(), other.control_->GetWeakCount());
 
-    other.Control.SetPtr(nullptr);
-    other.Control.SetValues(0, 0);
+    other.control_.SetPtr(nullptr);
+    other.control_.SetValues(0, 0);
 }
 
 template<typename T>
 template<typename Y>
 WeakPtr<T> &WeakPtr<T>::operator=(const SharedPtr<Y> &other) {
-    Control = other.Control;
+    control_ = other.control_;
 
-    Control->AddWeakPtr();
+    control_->AddWeakPtr();
     return *this;
 }
 
@@ -265,14 +267,14 @@ WeakPtr<T> &WeakPtr<T>::operator=(const WeakPtr &other) noexcept {
         return *this;
     }
 
-    if (Control) {
-        Control->DelWeak();
+    if (control_) {
+        control_->DelWeak();
     }
 
-    Control->SetPtr(other.Control->GetPtr());
-    Control->SetValues(other.Control->GetStrongCount(), other.Control->GetWeakCount());
+    control_->SetPtr(other.control_->GetPtr());
+    control_->SetValues(other.control_->GetStrongCount(), other.control_->GetWeakCount());
 
-    Control->AddWeakPtr();
+    control_->AddWeakPtr();
     return *this;
 }
 
@@ -282,42 +284,42 @@ WeakPtr<T> &WeakPtr<T>::operator=(WeakPtr &&other) noexcept {
         return *this;
     }
 
-    if (Control) {
-        Control->DelWeak();
+    if (control_) {
+        control_->DelWeak();
     }
 
-    Control = new ControlBlock<T>();
-    Control->SetPtr(other.Control->GetPtr());
-    Control->SetValues(other.Control->GetStrongCount(), other.Control->GetWeakCount());
+    control_ = new ControlBlock<T>();
+    control_->SetPtr(other.control_->GetPtr());
+    control_->SetValues(other.control_->GetStrongCount(), other.control_->GetWeakCount());
 
-    other.Control.SetPtr(nullptr);
-    other.Control.SetValues(0, 0);
+    other.control_.SetPtr(nullptr);
+    other.control_.SetValues(0, 0);
 }
 
 template<typename T>
 WeakPtr<T>::~WeakPtr() {
-    Control->DelWeak();
+    control_->DelWeak();
 }
 
 template<typename T>
 void WeakPtr<T>::Reset() noexcept {
-    if (Control) {
-        Control->SetPtr(nullptr);
-        Control->SetValues(0, 0);
+    if (control_) {
+        control_->SetPtr(nullptr);
+        control_->SetValues(0, 0);
     }
 }
 
 template<typename T>
 void WeakPtr<T>::Swap(WeakPtr<T> &other) noexcept {
-    auto tmp = other.Control;
-    other.Control = Control;
-    Control = tmp;
+    auto tmp = other.control_;
+    other.control_ = control_;
+    control_ = tmp;
 }
 
 template<typename T>
 bool WeakPtr<T>::Expired() const noexcept {
-    if (Control) {
-        return Control->GetStrongCount() == 0;
+    if (control_) {
+        return control_->GetStrongCount() == 0;
     }
     return true;
 }
