@@ -2,7 +2,6 @@
 
 #include <atomic>
 
-
 class SharedCount {
 public:
     explicit SharedCount(std::size_t count = 0) noexcept : StrongCount(count) {
@@ -45,7 +44,7 @@ public:
 
     explicit ControlBlock(T* ptr) : ptr_(ptr), del_(std::default_delete<T>()) {
     }
-    
+
     void DelShared() {
         StrongCount -= 1;
         if (NeedDel()) {
