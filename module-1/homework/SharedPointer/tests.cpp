@@ -134,7 +134,6 @@ TEST(SharedIndirectionOperator, Test1) {
     ASSERT_TRUE(*s1 == 1);
 }
 
-
 TEST(SharedArrowOperator, Test1) {
     struct Contrainer {
         constexpr int Foo() const noexcept {
