@@ -41,9 +41,9 @@ set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-header-filter=.")
 add_executable(runner tests.cpp)
 
 ################ clang-format ################
-#list(APPEND CMAKE_MODULE_PATH $ENV{CLANG_FORMAT_SUBMODULE}/cmake)
-#include(ClangFormat)
-#target_clangformat_setup()
+list(APPEND CMAKE_MODULE_PATH $ENV{CLANG_FORMAT_SUBMODULE}/cmake)
+include(ClangFormat)
+target_clangformat_setup()
 
 add_subdirectory(src/control)
 add_subdirectory(src/shared_ptr)
