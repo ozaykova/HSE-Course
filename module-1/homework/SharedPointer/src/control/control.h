@@ -5,7 +5,9 @@
 
 class SharedCount {
 public:
-    explicit SharedCount(std::size_t count = 0) noexcept: StrongCount(count) {}
+    explicit SharedCount(std::size_t count = 0) noexcept : StrongCount(count) {
+    }
+
     void AddStrongPtr() {
         StrongCount += 1;
     }
@@ -13,6 +15,7 @@ public:
     size_t GetStrongCount() {
         return StrongCount;
     }
+
 protected:
     std::atomic<std::size_t> StrongCount = 0;
 };
@@ -31,18 +34,18 @@ protected:
     std::atomic<size_t> WeakCount = 0;
 };
 
-template <typename T, typename Deleter=std::default_delete<T>>
+template <typename T, typename Deleter = std::default_delete<T>>
 class ControlBlock : public SharedWeakCount {
 public:
     ControlBlock() {
         ptr_ = new T();
     }
-    ControlBlock(T* ptr, Deleter deleter): ptr_(ptr), del_(deleter) {}
+    ControlBlock(T* ptr, Deleter deleter) : ptr_(ptr), del_(deleter) {
+    }
 
     explicit ControlBlock(T* ptr) : ptr_(ptr), del_(std::default_delete<T>()) {
     }
-
-
+    
     void DelShared() {
         StrongCount -= 1;
         if (NeedDel()) {
