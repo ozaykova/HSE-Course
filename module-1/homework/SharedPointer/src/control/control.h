@@ -81,7 +81,7 @@ public:
         WeakCount = weak;
         StrongCount = strong;
     }
-    
+
 private:
     T* ptr_ = nullptr;
     Deleter del_;
