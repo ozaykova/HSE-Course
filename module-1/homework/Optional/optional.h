@@ -201,12 +201,12 @@ constexpr T& Optional<T>::operator*() & {
     return base::val_;
 }
 
-template<typename T>
+template <typename T>
 constexpr const T&& Optional<T>::operator*() const&& {
     return std::move(base::val_);
 }
 
-template<typename T>
+template <typename T>
 constexpr T&& Optional<T>::operator*() && {
     return std::move(base::val_);
 }
