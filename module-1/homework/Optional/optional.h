@@ -22,7 +22,7 @@ class DestructHelper;
 template <typename T>
 class DestructHelper<T, false> {
 public:
-    explicit constexpr DestructHelper() noexcept
+    constexpr DestructHelper() noexcept
         : null_(), engaged_(false) {
     }
 
