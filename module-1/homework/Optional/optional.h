@@ -16,26 +16,26 @@ struct InPlace {
     explicit InPlace() = default;
 };
 
-constexpr InPlace kInPlace =  InPlace();
+constexpr InPlace kInPlace = InPlace();
 
 template <typename T, bool = std::is_trivially_destructible_v<T>>
 class DestructHelper;
 
 template <typename T>
-class DestructHelper <T, false> {
+class DestructHelper<T, false> {
 public:
-    constexpr DestructHelper() noexcept : engaged_(false) {
+    constexpr explicit DestructHelper() noexcept : engaged_(false) {
     }
 
-    constexpr DestructHelper(NullOpt) noexcept: engaged_(false) {
+    constexpr explicit DestructHelper(NullOpt) noexcept : engaged_(false) {
     }
 
     template <typename... Args>
-    constexpr DestructHelper(InPlace, Args&&... args): val_(std::forward<Args>(args)...), engaged_(true) {
+    constexpr explicit DestructHelper(InPlace, Args&&... args) : val_(std::forward<Args>(args)...), engaged_(true) {
     }
 
     template <typename U = T>
-    constexpr DestructHelper(U&& value): val_(std::forward<U>(value)), engaged_(true) {
+    constexpr explicit DestructHelper(U&& value) : val_(std::forward<U>(value)), engaged_(true) {
     }
 
     ~DestructHelper() {
@@ -66,20 +66,20 @@ protected:
 };
 
 template <typename T>
-class DestructHelper <T, true> {
+class DestructHelper<T, true> {
 public:
-    constexpr DestructHelper() noexcept : engaged_(false) {
+    constexpr explicit DestructHelper() noexcept : engaged_(false) {
     }
 
-    constexpr DestructHelper(NullOpt) noexcept: engaged_(false) {
+    constexpr explicit DestructHelper(NullOpt) noexcept : engaged_(false) {
     }
 
     template <typename... Args>
-    constexpr DestructHelper(InPlace, Args&&... args): val_(std::forward<Args>(args)...), engaged_(true) {
+    constexpr explicit DestructHelper(InPlace, Args&&... args) : val_(std::forward<Args>(args)...), engaged_(true) {
     }
 
     template <typename U = T>
-    constexpr DestructHelper(U&& value): val_(std::forward<U>(value)), engaged_(true) {
+    constexpr explicit DestructHelper(U&& value) : val_(std::forward<U>(value)), engaged_(true) {
     }
 
 protected:
@@ -108,20 +108,21 @@ protected:
 template <typename T>
 class Optional : public DestructHelper<T> {
 public:
-    using value_type =  T; // i dont know why we use this using...
+    using value_type = T; // i dont know why we use this using...
     using base = DestructHelper<T>;
 
     constexpr Optional() noexcept = default;
 
     template <typename U = value_type>
-    constexpr explicit Optional(U&& value): base(std::forward<U>(value)) {
+    constexpr explicit Optional(U&& value) : base(std::forward<U>(value)) {
     };
 
     constexpr explicit Optional(NullOpt) noexcept {
     }
 
     template <typename... Args>
-    constexpr explicit Optional(InPlace, Args&&... args): base(kInPlace, std::forward<Args>(args)...) {
+    constexpr explicit Optional(InPlace, Args&&... args)
+    : base(kInPlace, std::forward<Args>(args)...) {
     }
 
     Optional& operator=(NullOpt) noexcept {
@@ -135,7 +136,9 @@ public:
         return this;
     };
 
-    void Reset() noexcept;
+    void Reset() noexcept {
+        base::Reset();
+    }
 
     template <typename U>
     constexpr T ValueOr(U&& default_value) const& {
@@ -171,11 +174,6 @@ public:
 };
 
     template <typename T>
-    void Optional<T>::Reset() noexcept {
-        base::Reset();
-    }
-
-    template <typename T>
     constexpr bool Optional<T>::HasValue() const noexcept {
         return base::engaged_;
     }
@@ -196,22 +194,22 @@ public:
     }
 
     template <typename T>
-    constexpr const T& Optional<T>::operator*() const &{
+    constexpr const T& Optional<T>::operator*() const& {
         return base::val_;
     }
 
     template <typename T>
-    constexpr T& Optional<T>::operator*() &{
+    constexpr T& Optional<T>::operator*() & {
         return base::val_;
     }
 
     template<typename T>
-    constexpr const T &&Optional<T>::operator*() const &&{
+    constexpr const T&& Optional<T>::operator*() const&& {
         return std::move(base::val_);
     }
 
     template<typename T>
-    constexpr T &&Optional<T>::operator*() &&{
+    constexpr T&& Optional<T>::operator*() && {
         return std::move(base::val_);
     }
 }  // namespace task
