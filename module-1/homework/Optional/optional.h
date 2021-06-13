@@ -34,8 +34,7 @@ public:
     }
 
     template <typename U = T>
-    explicit constexpr DestructHelper(U&& value)
-        : val_(std::forward<U>(value)), engaged_(true) {
+    explicit constexpr DestructHelper(U&& value) : val_(std::forward<U>(value)), engaged_(true) {
     }
 
     ~DestructHelper() {
@@ -68,12 +67,10 @@ protected:
 template <typename T>
 class DestructHelper<T, true> {
 public:
-    explicit constexpr DestructHelper() noexcept
-        : null_(), engaged_(false) {
+    explicit constexpr DestructHelper() noexcept : null_(), engaged_(false) {
     }
 
-    explicit constexpr DestructHelper(NullOpt) noexcept
-        : null_(), engaged_(false) {
+    explicit constexpr DestructHelper(NullOpt) noexcept : null_(), engaged_(false) {
     }
 
     template <typename... Args>
@@ -82,8 +79,7 @@ public:
     }
 
     template <typename U = T>
-    explicit constexpr DestructHelper(U&& value)
-        : val_(std::forward<U>(value)), engaged_(true) {
+    explicit constexpr DestructHelper(U&& value) : val_(std::forward<U>(value)), engaged_(true) {
     }
 
 protected:
@@ -124,8 +120,7 @@ public:
     }
 
     template <typename... Args>
-    explicit constexpr Optional(InPlace, Args&&... args)
-        : base(kInPlace, std::forward<Args>(args)...) {
+    explicit constexpr Optional(InPlace, Args&&... args) : base(kInPlace, std::forward<Args>(args)...) {
     }
 
     Optional& operator=(NullOpt) noexcept {
