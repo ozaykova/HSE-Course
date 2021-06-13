@@ -112,15 +112,15 @@ public:
     constexpr Optional() noexcept = default;
 
     template <typename U = value_type>
-    explicit constexpr Optional(U&& value)
-        : base(std::forward<U>(value)) {
-    };
+    explicit constexpr Optional(U&& value) : base(std::forward<U>(value)) {
+    }
 
     explicit constexpr Optional(NullOpt) noexcept {
     }
 
     template <typename... Args>
-    explicit constexpr Optional(InPlace, Args&&... args) : base(kInPlace, std::forward<Args>(args)...) {
+    explicit constexpr Optional(InPlace, Args&&... args)
+        : base(kInPlace, std::forward<Args>(args)...) {
     }
 
     Optional& operator=(NullOpt) noexcept {
@@ -171,43 +171,43 @@ public:
     constexpr value_type&& operator*() &&;
 };
 
-    template <typename T>
-    constexpr bool Optional<T>::HasValue() const noexcept {
-        return base::engaged_;
-    }
+template <typename T>
+constexpr bool Optional<T>::HasValue() const noexcept {
+    return base::engaged_;
+}
 
-    template <typename T>
-    constexpr Optional<T>::operator bool() const noexcept {
-        return base::engaged_;
-    }
+template <typename T>
+constexpr Optional<T>::operator bool() const noexcept {
+    return base::engaged_;
+}
 
-    template <typename T>
-    constexpr std::add_pointer_t<const T> Optional<T>::operator->() const {
-        return base::val_;
-    }
+template <typename T>
+constexpr std::add_pointer_t<const T> Optional<T>::operator->() const {
+    return base::val_;
+}
 
-    template <typename T>
-    constexpr std::add_pointer_t<T> Optional<T>::operator->() {
-        return &(base::val_);
-    }
+template <typename T>
+constexpr std::add_pointer_t<T> Optional<T>::operator->() {
+    return &(base::val_);
+}
 
-    template <typename T>
-    constexpr const T& Optional<T>::operator*() const& {
-        return base::val_;
-    }
+template <typename T>
+constexpr const T& Optional<T>::operator*() const& {
+    return base::val_;
+}
 
-    template <typename T>
-    constexpr T& Optional<T>::operator*() & {
-        return base::val_;
-    }
+template <typename T>
+constexpr T& Optional<T>::operator*() & {
+    return base::val_;
+}
 
-    template<typename T>
-    constexpr const T&& Optional<T>::operator*() const&& {
-        return std::move(base::val_);
-    }
+template<typename T>
+constexpr const T&& Optional<T>::operator*() const&& {
+    return std::move(base::val_);
+}
 
-    template<typename T>
-    constexpr T&& Optional<T>::operator*() && {
-        return std::move(base::val_);
-    }
+template<typename T>
+constexpr T&& Optional<T>::operator*() && {
+    return std::move(base::val_);
+}
 }  // namespace task
