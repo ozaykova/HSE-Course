@@ -31,11 +31,13 @@ public:
     }
 
     template <typename... Args>
-    constexpr explicit DestructHelper(InPlace, Args&&... args) : val_(std::forward<Args>(args)...), engaged_(true) {
+    constexpr explicit DestructHelper(InPlace, Args&&... args)
+    : val_(std::forward<Args>(args)...), engaged_(true) {
     }
 
     template <typename U = T>
-    constexpr explicit DestructHelper(U&& value) : val_(std::forward<U>(value)), engaged_(true) {
+    constexpr explicit DestructHelper(U&& value)
+    : val_(std::forward<U>(value)), engaged_(true) {
     }
 
     ~DestructHelper() {
@@ -75,11 +77,13 @@ public:
     }
 
     template <typename... Args>
-    constexpr explicit DestructHelper(InPlace, Args&&... args) : val_(std::forward<Args>(args)...), engaged_(true) {
+    constexpr explicit DestructHelper(InPlace, Args&&... args)
+    : val_(std::forward<Args>(args)...), engaged_(true) {
     }
 
     template <typename U = T>
-    constexpr explicit DestructHelper(U&& value) : val_(std::forward<U>(value)), engaged_(true) {
+    constexpr explicit DestructHelper(U&& value)
+    : val_(std::forward<U>(value)), engaged_(true) {
     }
 
 protected:
@@ -103,12 +107,10 @@ protected:
     }
 };
 
-
-
 template <typename T>
 class Optional : public DestructHelper<T> {
 public:
-    using value_type = T; // i dont know why we use this using...
+    using value_type = T; //i dont know why we use this using...
     using base = DestructHelper<T>;
 
     constexpr Optional() noexcept = default;
