@@ -24,7 +24,7 @@ class DestructHelper<T, false> {
 public:
     constexpr explicit DestructHelper() noexcept
         : null_(), engaged_(false) {
-    }
+        }
 
     constexpr explicit DestructHelper(NullOpt) noexcept
         : null_(), engaged_(false) {
@@ -112,7 +112,7 @@ protected:
 template <typename T>
 class Optional : public DestructHelper<T> {
 public:
-    using value_type = T; //i dont know why we use this using...
+    using value_type = T;
     using base = DestructHelper<T>;
 
     constexpr Optional() noexcept = default;
@@ -136,7 +136,7 @@ public:
     }
 
     template <typename U = T>
-    Optional& operator=(U&& value){
+    Optional& operator=(U&& value) {
         base::Set(std::forward<U>(value));
         return *this;
     };
