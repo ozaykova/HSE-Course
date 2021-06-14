@@ -123,7 +123,7 @@ template <typename TargetType, typename... Types>
 struct FindExactlyOneChecked {
     constexpr static bool kFounded[sizeof...(Types)] = {std::is_same<TargetType, Types>::value...};
     constexpr static bool kFoundedConvertible[sizeof...(Types)] = {
-            std::is_convertible<TargetType, Types>::value...};
+        std::is_convertible<TargetType, Types>::value...};
     constexpr static size_t kValue = FindPos(0, kFounded, kFoundedConvertible);
 };
 
