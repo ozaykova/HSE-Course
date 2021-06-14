@@ -146,7 +146,7 @@ using variant_alternative_t = typename VariantAlternative<Idx, T>::type;
 
 template <size_t Idx, typename... Types>
 struct VariantAlternative<Idx, Variant<Types...>> {
-  using type = typename TypeAt<Idx, TypeList<Types...>>::result;
+    using type = typename TypeAt<Idx, TypeList<Types...>>::result;
 };
 
 template <typename... Types>
