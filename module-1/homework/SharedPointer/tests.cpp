@@ -5,6 +5,7 @@
 #include "src/shared_ptr/shared_ptr.h"
 
 // WeakPtr
+
 TEST(WeakExpired, Test1) {
     WeakPtr<int32_t> w;
     {
@@ -53,6 +54,7 @@ TEST(SharedMoveConstructor, Test1) {
     SharedPtr<Contrainer> s1 = MakeShared<Contrainer>();
     Contrainer* raw_s1 = s1.Get();
     SharedPtr<Contrainer> s2 = std::move(s1);
+    ASSERT_TRUE(s1.UseCount() == 0);
     ASSERT_TRUE(s1.UseCount() == 0 && s1.Get() == nullptr && s2.Get() == raw_s1 &&
                 s2.UseCount() == 1);
 }

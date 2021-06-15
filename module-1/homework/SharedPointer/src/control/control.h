@@ -4,25 +4,88 @@
 
 class SharedCount {
 public:
-    // Your code goes here...
+    explicit SharedCount(std::size_t count = 0) noexcept : StrongCount(count) {
+    }
+
+    void AddStrongPtr() {
+        StrongCount += 1;
+    }
+
+    size_t GetStrongCount() {
+        return StrongCount;
+    }
 
 protected:
-    // Your code goes here...
+    std::atomic<std::size_t> StrongCount = 0;
 };
 
 class SharedWeakCount : public SharedCount {
 public:
-    // Your code goes here...
+    void AddWeakPtr() {
+        WeakCount += 1;
+    }
+
+    size_t GetWeakCount() {
+        return WeakCount;
+    }
 
 protected:
-    // Your code goes here...
+    std::atomic<size_t> WeakCount = 0;
 };
 
-template <typename T, typename Deleter>
+template <typename T, typename Deleter = std::default_delete<T>>
 class ControlBlock : public SharedWeakCount {
 public:
-    // Your code goes here...
+    ControlBlock() {
+        ptr_ = new T();
+    }
+    ControlBlock(T* ptr, Deleter deleter) : ptr_(ptr), del_(deleter) {
+    }
+
+    explicit ControlBlock(T* ptr) : ptr_(ptr), del_(std::default_delete<T>()) {
+    }
+
+    void DelShared() {
+        StrongCount -= 1;
+        if (NeedDel()) {
+            del_(ptr_);
+        }
+    }
+
+    void DelWeak() {
+        WeakCount -= 1;
+        if (NeedDel()) {
+            del_(ptr_);
+        }
+    }
+
+    bool IsEmpty() {
+        return ptr_ == nullptr;
+    }
+
+    T* GetPtr() {
+        return ptr_;
+    }
+
+    void SetPtr(T ptr) {
+        if (&ptr) {
+            ptr_ = &ptr;
+        }
+    }
+
+    void SetPtr(T* ptr) {
+        ptr_ = ptr;
+    }
+
+    void SetValues(size_t strong, size_t weak) {
+        WeakCount = weak;
+        StrongCount = strong;
+    }
 
 private:
-    // Your code goes here...
+    T* ptr_ = nullptr;
+    Deleter del_;
+    bool NeedDel() {
+        return GetStrongCount() + GetWeakCount() == 0 && ptr_ != nullptr;
+    }
 };
