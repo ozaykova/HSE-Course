@@ -101,7 +101,6 @@ public:
 
     typedef typename std::allocator_traits<Allocator>::template rebind_alloc<Node> node_allocator;
 
-
     // List variables
     node_allocator alloc_;
     // Your code goes here
@@ -112,7 +111,7 @@ public:
     List(const List& other) {
         size_ = 0;
         auto tmp = other.head_;
-        while (tmp!= other.tail_) {
+        while (tmp != other.tail_) {
             PushBack(tmp->value);
             tmp = tmp->next;
         }
@@ -121,7 +120,7 @@ public:
     List(const List& other, const Allocator& alloc) {
         size_ = 0;
         auto tmp = other.head_;
-        while (tmp!= other.tail_) {
+        while (tmp != other.tail_) {
             PushBack(tmp->value);
             tmp = tmp->next;
         }
@@ -134,7 +133,7 @@ public:
     List(List&& other, const Allocator& alloc) {
         alloc_ = alloc;
         auto tmp = other.head_;
-        while (tmp!= other.tail_) {
+        while (tmp != other.tail_) {
             PushBack(std::move(tmp->value));
             tmp = tmp->next;
         }
@@ -269,7 +268,7 @@ public:
         }
         size_ += 1;
     }
-    
+
     template <typename... Args>
     void EmplaceBack(Args&&... args) {
         Node* e = alloc_.allocate(1);
