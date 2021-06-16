@@ -9,7 +9,7 @@
 
 template <bool condition, typename T, typename F>
 struct Conditional {
-    // Your code goes here
+    using type = F;
 };
 
 // Conditional - partial specialization
@@ -22,8 +22,14 @@ struct Conditional<true, T, F> {
 };
 
 template <bool condition, typename T, typename F>
-using conditional_v = // Your code goes here
+using conditional_v = typename Conditional<condition, T, F>::type;
 
 // MoveIfNoExcept
 // Your code goes here
 // MoveIfNoExcept
+
+template <typename T>
+conditional_v<!IsNoThrowMoveConstructible<T>::value && IsCopyConstructible<T>::value, const T&, T&&>
+MoveIfNoExcept(T& x) {
+    return std::move(x);
+}
