@@ -19,9 +19,7 @@ public:
     CustomAllocator() = default;
 
     CustomAllocator(const CustomAllocator& other) noexcept
-            : arena_{other.arena_},
-              arena_offset_{other.arena_offset_},
-              num_(other.num_) {
+        : arena_{other.arena_}, arena_offset_{other.arena_offset_}, num_(other.num_) {
         ++(*num_);
     }
 
@@ -37,30 +35,30 @@ public:
     template <typename U>
     explicit CustomAllocator(const CustomAllocator<U>& other) noexcept
         : arena_{other.GetArena()},
-        arena_offset_{other.GetArenaOffset()},
-        num_(other.GetNumAllocators()) {
-            ++(*num_);
-        }
+          arena_offset_{other.GetArenaOffset()},
+          num_(other.GetNumAllocators()) {
+        ++(*num_);
+    }
 
-        void* GetArena() const {
-            return arena_;
-        }
+    void* GetArena() const {
+        return arena_;
+    }
 
-        size_t* GetArenaOffset() const {
-            return arena_offset_;
-        }
+    size_t* GetArenaOffset() const {
+        return arena_offset_;
+    }
 
-        size_t* GetNumAllocators() const {
-            return num_;
-        }
-
+    size_t* GetNumAllocators() const {
+        return num_;
+    }
 
     T* allocate(size_t n) {  // NOLINT
         pointer next_address = static_cast<pointer>(arena_) + *arena_offset_;
         *arena_offset_ += n;
         return next_address;
     }
-    void deallocate(T* p, size_t n) {  // NOLINT
+    void deallocate(T* p, size_t n){
+        // NOLINT
     };
     template <typename... Args>
     void construct(pointer p, Args&&... args) {  // NOLINT
